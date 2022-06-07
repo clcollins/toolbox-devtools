@@ -1,8 +1,6 @@
 IMAGE_NAME = "devtools"
 GIT_HASH := $(shell git rev-parse --short HEAD)
 
-TMPDIR := $(shell mktemp -d /tmp/ocm-container-custom.XXXXX)
-
 CONTAINER_SUBSYS?="podman"
 
 default: all
