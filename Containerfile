@@ -8,17 +8,28 @@ MAINTAINER "Chris Collins <collins.christopher@gmail.com>"
 ENV CONTAINER_SUBSYS "flatpak-spawn --host podman"
 ENV PKGS "make gcc bison binutils jq"
 ENV LANGUAGE_PKGS "python3 python3-pip golang"
-ENV TOOLS "gh"
-ENV GH_CLI "https://cli.github.com/packages/rpm/gh-cli.repo"
 
-RUN dnf install 'dnf-command(config-manager)' \
-  && dnf config-manager --add-repo $GH_CLI \
-  && dnf install --assumeyes $PKGS $PYTHON_PKGS $TOOLS \
+RUN dnf install --assumeyes 'dnf-command(config-manager)' \
+  && dnf install --assumeyes $PKGS $PYTHON_PKGS \
   && dnf clean all \
   && rm --recursive --force /var/cache/yum/
 
-# Validate gh install
-RUN gh --version
+# Install Google Cloud CLI
+ENV GCLOUD_CLI "https://packages.cloud.google.com/yum/repos/cloud-sdk-el8-x86_64"
+ENV GCLOUD_KEYS "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+RUN dnf config-manager --add-repo ${GCLOUD_CLI} \
+  && rpm --import $GCLOUD_KEYS \
+  && dnf install --assumeyes libxcrypt-compat.x86_64 \
+  && dnf install --assumeyes google-cloud-cli \
+  && dnf clean all \
+  && rm --recursive --force /var/cache/yum/
+
+# Install gh cli
+ENV GH_CLI "https://cli.github.com/packages/rpm/gh-cli.repo"
+RUN dnf config-manager --add-repo ${GH_CLI} \
+  && dnf install --assumeyes gh \
+  && dnf clean all \
+  && rm --recursive --force /var/cache/yum/
 
 # Create podman cmd
 RUN echo -e '#!/bin/sh\nexec ${CONTAINER_SUBSYS} $@' > /usr/bin/podman \
