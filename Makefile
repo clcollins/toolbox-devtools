@@ -15,3 +15,8 @@ build:
 .PHONY: tag
 tag: 
 	${CONTAINER_SUBSYS} tag ${IMAGE_NAME}:${GIT_HASH} ${IMAGE_NAME}:latest
+
+.PHONY: cleanup-boostrap
+cleanup-bootstrap:
+	${CONTAINER_SUBSYS} stop bootstrap
+	${CONTAINER_SUBSYS} rm bootstrap
