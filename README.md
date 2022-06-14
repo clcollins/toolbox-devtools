@@ -16,14 +16,14 @@ sudo dnf install -y make git
 CONTAINER_SUBSYS="flatpak-spawn --host podman" make
 ```
 
-Alternatively, after entering the boostrap toolbox, you may run `./bootstrap.sh` to perform the package install and image build.
-
 This will create a "devtools" image locally on the Silverblue host.  From there, you can create a "devtools" container:
 
 ```shell
 toolbox create devtools --image devtools:latest
 toolbox enter devtools
 ```
+
+Alternatively, after entering the boostrap toolbox, you may run `./bootstrap.sh` to perform the package install and image build, and create the devtools image in one step.
 
 If you desire, from inside the devtools container, you may run `make cleanup-boostrap` to remove the bootstrap toolbox.
 
