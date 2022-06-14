@@ -6,8 +6,8 @@ FROM registry.fedoraproject.org/fedora-toolbox:36
 MAINTAINER "Chris Collins <collins.christopher@gmail.com>"
 
 ENV CONTAINER_SUBSYS "flatpak-spawn --host podman"
-ENV PKGS "make gcc bison binutils"
-ENV PYTHON_PKGS "python3 python3-pip"
+ENV PKGS "make gcc bison binutils jq"
+ENV LANGUAGE_PKGS "python3 python3-pip golang"
 ENV TOOLS "gh"
 ENV GH_CLI "https://cli.github.com/packages/rpm/gh-cli.repo"
 
@@ -19,3 +19,7 @@ RUN dnf install 'dnf-command(config-manager)' \
 
 # Validate gh install
 RUN gh --version
+
+# Create podman cmd
+RUN echo -e '#!/bin/sh\nexec ${CONTAINER_SUBSYS} $@' > /usr/bin/podman \
+  && chmod +x /usr/bin/podman
