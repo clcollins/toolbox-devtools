@@ -3,6 +3,8 @@ GIT_HASH := $(shell git rev-parse --short HEAD)
 
 CONTAINER_SUBSYS?="podman"
 
+BUILD_ARGS ?= ""
+
 default: all
 
 .PHONY: all
@@ -10,7 +12,7 @@ all: build tag
 
 .PHONY: build
 build: 
-	${CONTAINER_SUBSYS} build -t ${IMAGE_NAME}:${GIT_HASH} .
+	${CONTAINER_SUBSYS} build ${BUILD_ARGS} -t ${IMAGE_NAME}:${GIT_HASH} .
 
 .PHONY: tag
 tag: 
