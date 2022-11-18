@@ -3,7 +3,7 @@ GIT_HASH := $(shell git rev-parse --short HEAD)
 
 CONTAINER_SUBSYS?="podman"
 
-BUILD_ARGS ?= ""
+BUILD_ARGS ?= 
 
 default: all
 
