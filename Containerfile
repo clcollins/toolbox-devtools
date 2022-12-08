@@ -6,11 +6,11 @@ FROM registry.fedoraproject.org/fedora-toolbox:37
 MAINTAINER "Chris Collins <collins.christopher@gmail.com>"
 
 ENV CONTAINER_SUBSYS "flatpak-spawn --host podman"
-ENV PKGS "make gcc bison binutils jq"
+ENV PKGS "make gcc bison binutils jq flatpak"
 ENV LANGUAGE_PKGS "python3 python3-pip golang"
 
 RUN dnf install --assumeyes 'dnf-command(config-manager)' \
-  && dnf install --assumeyes $PKGS $PYTHON_PKGS \
+  && dnf install --assumeyes $PKGS $LANGUAGE_PKGS \
   && dnf clean all \
   && rm --recursive --force /var/cache/yum/
 
