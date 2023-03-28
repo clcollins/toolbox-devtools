@@ -6,7 +6,7 @@ FROM registry.fedoraproject.org/fedora-toolbox:37
 MAINTAINER "Chris Collins <collins.christopher@gmail.com>"
 
 ENV CONTAINER_SUBSYS "flatpak-spawn --host podman"
-ENV PKGS "make gcc bison binutils jq flatpak"
+ENV PKGS "make gcc bison binutils jq flatpak httpie"
 ENV LANGUAGE_PKGS "python3 python3-pip golang"
 ENV OPERATOR_SDK_DL_URL "https://github.com/operator-framework/operator-sdk/releases/download/v1.25.2"
 
