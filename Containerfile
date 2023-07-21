@@ -2,7 +2,7 @@
 # and run with `toolbox create --image NAME`. This allows podman on the 
 # host to be used from within the toolbox via the flatpak-spawn command.
 
-FROM registry.fedoraproject.org/fedora-toolbox:37
+FROM registry.fedoraproject.org/fedora-toolbox:38
 MAINTAINER "Chris Collins <collins.christopher@gmail.com>"
 
 ENV CONTAINER_SUBSYS "flatpak-spawn --host podman"
@@ -24,6 +24,7 @@ RUN curl -LO ${OPERATOR_SDK_DL_URL}/operator-sdk_linux_amd64 \
 ENV GCLOUD_CLI "https://packages.cloud.google.com/yum/repos/cloud-sdk-el8-x86_64"
 ENV GCLOUD_CLI_REPO_NAME "packages.cloud.google.com_yum_repos_cloud-sdk-el8-x86_64"
 ENV GCLOUD_KEYS "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+
 RUN dnf config-manager --add-repo ${GCLOUD_CLI} \
   && rpm --import $GCLOUD_KEYS \
   && dnf install --assumeyes libxcrypt-compat.x86_64 \
