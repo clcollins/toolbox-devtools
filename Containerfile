@@ -6,9 +6,9 @@ FROM registry.fedoraproject.org/fedora-toolbox:38
 MAINTAINER "Chris Collins <collins.christopher@gmail.com>"
 
 ENV CONTAINER_SUBSYS "flatpak-spawn --host podman"
-ENV PKGS "make gcc bison binutils jq flatpak httpie"
+ENV PKGS "make gcc bison binutils jq flatpak httpie NetworkManager"
 ENV LANGUAGE_PKGS "python3 python3-pip golang"
-ENV OPERATOR_SDK_DL_URL "https://github.com/operator-framework/operator-sdk/releases/download/v1.25.2"
+ENV OPERATOR_SDK_DL_URL "https://github.com/operator-framework/operator-sdk/releases/download/v1.29.0"
 
 RUN dnf install --assumeyes 'dnf-command(config-manager)' \
   && dnf install --assumeyes $PKGS $LANGUAGE_PKGS \
@@ -46,3 +46,8 @@ RUN dnf config-manager --add-repo ${GH_CLI} \
 # Create podman cmd
 RUN echo -e '#!/bin/sh\nexec ${CONTAINER_SUBSYS} $@' > /usr/bin/podman \
   && chmod +x /usr/bin/podman
+
+# Add RH CA Certs
+RUN curl -sSL -o /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt https://certs.corp.redhat.com/certs/2015-IT-Root-CA.pem
+RUN curl -sSL -o /etc/pki/ca-trust/source/anchors/2022-IT-Root-CA.pem https://certs.corp.redhat.com/certs/2022-IT-Root-CA.pem
+RUN update-ca-trust
