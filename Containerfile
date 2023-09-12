@@ -3,14 +3,16 @@
 # host to be used from within the toolbox via the flatpak-spawn command.
 
 FROM registry.fedoraproject.org/fedora-toolbox:38
-MAINTAINER "Chris Collins <collins.christopher@gmail.com>"
+LABEL author "Chris Collins <collins.christopher@gmail.com>"
 
 ENV CONTAINER_SUBSYS "flatpak-spawn --host podman"
-ENV PKGS "make gcc bison binutils jq flatpak httpie NetworkManager"
+ENV PKGS "make gcc bison binutils jq flatpak httpie NetworkManager tmux"
 ENV LANGUAGE_PKGS "python3 python3-pip golang"
 ENV OPERATOR_SDK_DL_URL "https://github.com/operator-framework/operator-sdk/releases/download/v1.29.0"
 
-RUN dnf install --assumeyes 'dnf-command(config-manager)' \
+
+RUN  dnf update --assumeyes \
+  && dnf install --assumeyes 'dnf-command(config-manager)' \
   && dnf install --assumeyes $PKGS $LANGUAGE_PKGS \
   && dnf clean all \
   && rm --recursive --force /var/cache/yum/
@@ -51,3 +53,4 @@ RUN echo -e '#!/bin/sh\nexec ${CONTAINER_SUBSYS} $@' > /usr/bin/podman \
 RUN curl -sSL -o /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt https://certs.corp.redhat.com/certs/2015-IT-Root-CA.pem
 RUN curl -sSL -o /etc/pki/ca-trust/source/anchors/2022-IT-Root-CA.pem https://certs.corp.redhat.com/certs/2022-IT-Root-CA.pem
 RUN update-ca-trust
+
