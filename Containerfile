@@ -2,12 +2,12 @@
 # and run with `toolbox create --image NAME`. This allows podman on the 
 # host to be used from within the toolbox via the flatpak-spawn command.
 
-FROM registry.fedoraproject.org/fedora-toolbox:38
+FROM registry.fedoraproject.org/fedora-toolbox:40
 LABEL author "Chris Collins <collins.christopher@gmail.com>"
 
 ENV CONTAINER_SUBSYS "flatpak-spawn --host podman"
-ENV PKGS "make gcc bison binutils jq flatpak httpie NetworkManager tmux gnome-keyring"
-ENV LANGUAGE_PKGS "python3 python3-pip golang"
+ENV PKGS "make gcc bison binutils jq flatpak httpie NetworkManager tmux gnome-keyring glab tinygo"
+ENV LANGUAGE_PKGS "python3 python3-pip"
 ENV OPERATOR_SDK_DL_URL "https://github.com/operator-framework/operator-sdk/releases/download/v1.29.0"
 
 
