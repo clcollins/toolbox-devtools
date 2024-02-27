@@ -1,22 +1,39 @@
+REGISTRY_NAME := "quay.io"
+ORG_NAME := "chcollin"
 IMAGE_NAME = "devtools"
 GIT_HASH := $(shell git rev-parse --short HEAD)
 
+TAG := ${REGISTRY_NAME}/${ORG_NAME}/toolbox-${IMAGE_NAME}:${GIT_HASH}
+TAG_LATEST := ${REGISTRY_NAME}/${ORG_NAME}/toolbox-${IMAGE_NAME}:latest
+
 CONTAINER_SUBSYS?="podman"
 
-BUILD_ARGS ?= 
+BUILD_ARGS ?= "--build_arg=GIT_HASH=${GIT_HASH}"
+
+ALLOW_DIRTY_CHECKOUT?=false
 
 default: all
 
 .PHONY: all
-all: build tag
+all: isclean build tag push
+
+.PHONY: isclean
+isclean:
+	@(test "$(ALLOW_DIRTY_CHECKOUT)" != "false" || test 0 -eq $$(git status --porcelain | wc -l)) || (echo "Local git checkout is not clean, commit changes and try again." >&2 && git --no-pager diff && exit 1)
 
 .PHONY: build
 build: 
-	${CONTAINER_SUBSYS} build ${BUILD_ARGS} -t ${IMAGE_NAME}:${GIT_HASH} .
+	${CONTAINER_SUBSYS} build ${BUILD_ARGS} -t ${TAG} .
 
 .PHONY: tag
 tag: 
-	${CONTAINER_SUBSYS} tag ${IMAGE_NAME}:${GIT_HASH} ${IMAGE_NAME}:latest
+	${CONTAINER_SUBSYS} tag ${TAG} ${TAG_LATEST}
+	${CONTAINER_SUBSYS} tag ${TAG} ${IMAGE_NAME}:latest
+
+.PHONY: push
+push:
+	${CONTAINER_SUBSYS} push ${TAG} --authfile=${AUTHFILE}
+	${CONTAINER_SUBSYS} push ${TAG_LATEST} --authfile=${AUTHFILE}
 
 .PHONY: cleanup-bootstrap
 cleanup-bootstrap:

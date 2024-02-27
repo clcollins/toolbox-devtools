@@ -3,13 +3,16 @@
 # host to be used from within the toolbox via the flatpak-spawn command.
 
 FROM registry.fedoraproject.org/fedora-toolbox:40
+ARG GIT_HASH
+
+LABEL toolbox-devtools-version=${GIT_HASH}
 LABEL author "Chris Collins <collins.christopher@gmail.com>"
 
+ENV   toolbox-devtools-version=${GIT_HASH}
 ENV CONTAINER_SUBSYS "flatpak-spawn --host podman"
 ENV PKGS "make gcc bison binutils jq flatpak httpie NetworkManager tmux gnome-keyring glab tinygo"
 ENV LANGUAGE_PKGS "python3 python3-pip"
 ENV OPERATOR_SDK_DL_URL "https://github.com/operator-framework/operator-sdk/releases/download/v1.29.0"
-
 
 RUN  dnf update --assumeyes \
   && dnf install --assumeyes 'dnf-command(config-manager)' \
