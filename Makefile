@@ -11,6 +11,7 @@ TAG_LATEST := ${REGISTRY_NAME}/${ORG_NAME}/toolbox-${IMAGE_NAME}:latest
 CONTAINER_SUBSYS?="podman"
 
 BUILD_ARGS ?= "--build-arg=GIT_HASH=${GIT_HASH}"
+CACHE ?= "--no-cache"
 
 ALLOW_DIRTY_CHECKOUT?=false
 
@@ -25,7 +26,7 @@ isclean:
 
 .PHONY: build
 build: 
-	${CONTAINER_SUBSYS} build ${BUILD_ARGS} -t ${TAG} .
+	${CONTAINER_SUBSYS} build ${CACHE} ${BUILD_ARGS} -t ${TAG} .
 
 .PHONY: tag
 tag: 
