@@ -1,5 +1,7 @@
 REGISTRY_NAME := "quay.io"
 ORG_NAME := "chcollin"
+AUTHFILE := "${HOME}/.config/quay.io/bot_auth.json"
+
 IMAGE_NAME = "devtools"
 GIT_HASH := $(shell git rev-parse --short HEAD)
 
