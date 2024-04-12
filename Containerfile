@@ -10,20 +10,14 @@ LABEL author "Chris Collins <collins.christopher@gmail.com>"
 
 ENV   toolbox-devtools-version=${GIT_HASH}
 ENV CONTAINER_SUBSYS "flatpak-spawn --host podman"
-ENV PKGS "make gcc bison binutils jq flatpak httpie NetworkManager tmux gnome-keyring glab tinygo"
-ENV LANGUAGE_PKGS "python3 python3-pip"
-ENV OPERATOR_SDK_DL_URL "https://github.com/operator-framework/operator-sdk/releases/download/v1.29.0"
+ENV PKGS "make gcc bison binutils jq flatpak httpie NetworkManager tmux gnome-keyring glab yamllint"
+ENV LANGUAGE_PKGS "python3 python3-pip tinygo"
 
 RUN  dnf update --assumeyes \
   && dnf install --assumeyes 'dnf-command(config-manager)' \
   && dnf install --assumeyes $PKGS $LANGUAGE_PKGS \
   && dnf clean all \
   && rm --recursive --force /var/cache/yum/
-
-# Install Operator SDK
-RUN curl -LO ${OPERATOR_SDK_DL_URL}/operator-sdk_linux_amd64 \
-  && chmod +x operator-sdk_linux_amd64 \
-  && mv operator-sdk_linux_amd64 /usr/local/bin/operator-sdk
 
 # Install Google Cloud CLI
 ENV GCLOUD_CLI "https://packages.cloud.google.com/yum/repos/cloud-sdk-el8-x86_64"
