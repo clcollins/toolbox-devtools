@@ -8,6 +8,8 @@ ARG GIT_HASH
 LABEL toolbox-devtools-version=${GIT_HASH}
 LABEL author "Chris Collins <collins.christopher@gmail.com>"
 
+ENV EDITOR=vi
+
 ENV   toolbox-devtools-version=${GIT_HASH}
 ENV CONTAINER_SUBSYS "flatpak-spawn --host podman"
 ENV PKGS "make gcc bison binutils jq flatpak httpie NetworkManager tmux gnome-keyring glab yamllint"
