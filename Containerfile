@@ -3,14 +3,13 @@
 # host to be used from within the toolbox via the flatpak-spawn command.
 
 FROM registry.fedoraproject.org/fedora-toolbox:40
-ARG GIT_HASH
-
-LABEL toolbox-devtools-version=${GIT_HASH}
 LABEL author "Chris Collins <collins.christopher@gmail.com>"
+
+ARG GIT_HASH
+LABEL toolbox-devtools-version=${GIT_HASH}
 
 ENV EDITOR=vi
 
-ENV   toolbox-devtools-version=${GIT_HASH}
 ENV CONTAINER_SUBSYS "flatpak-spawn --host podman"
 ENV PKGS "make gcc bison binutils jq flatpak httpie NetworkManager tmux gnome-keyring glab yamllint"
 ENV LANGUAGE_PKGS "python3 python3-pip tinygo"
@@ -47,9 +46,4 @@ RUN dnf config-manager --add-repo ${GH_CLI} \
 # Create podman cmd
 RUN echo -e '#!/bin/sh\nexec ${CONTAINER_SUBSYS} $@' > /usr/bin/podman \
   && chmod +x /usr/bin/podman
-
-# Add RH CA Certs
-RUN curl -sSL -o /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt https://certs.corp.redhat.com/certs/2015-IT-Root-CA.pem
-RUN curl -sSL -o /etc/pki/ca-trust/source/anchors/2022-IT-Root-CA.pem https://certs.corp.redhat.com/certs/2022-IT-Root-CA.pem
-RUN update-ca-trust
 
