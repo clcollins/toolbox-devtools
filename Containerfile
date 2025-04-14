@@ -11,7 +11,7 @@ LABEL toolbox-devtools-version=${GIT_HASH}
 ENV EDITOR=vi
 
 ENV CONTAINER_SUBSYS "flatpak-spawn --host podman"
-ENV PKGS "make gcc bison binutils jq flatpak httpie NetworkManager tmux gnome-keyring glab yamllint"
+ENV PKGS "make gcc bison binutils jq flatpak httpie NetworkManager tmux gnome-keyring glab vim yamllint"
 ENV LANGUAGE_PKGS "python3 python3-pip tinygo"
 
 RUN  dnf update --assumeyes \
