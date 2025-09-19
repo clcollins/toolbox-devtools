@@ -29,6 +29,9 @@ isclean:
 build: 
 	${CONTAINER_SUBSYS} build ${CACHE} ${IMAGE_PULL_POLICY} ${BUILD_ARGS} -t ${TAG} .
 
+.PHONY: test
+test: build
+
 .PHONY: tag
 tag: 
 	${CONTAINER_SUBSYS} tag ${TAG} ${TAG_LATEST}
