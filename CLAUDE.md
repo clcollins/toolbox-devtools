@@ -52,7 +52,10 @@ When making changes to this repository:
    - Create commit message with descriptive body that accurately describes what is included in the commit
    - Include note that code changes, commit message, and commit were created by Claude and signed-off by @clcollins
    - Use `-s` and `-S` flags for signed commits: `git commit -s -S -m "message"`
-4. After committing, offer to create pull request using `gh pr create`
+4. When creating pull requests:
+   - Create a new branch for the changes: `git checkout -b branch-name`
+   - Push the branch to remote: `git push -u origin branch-name`
+   - Create pull request using `gh pr create` with descriptive title and body
 5. After PR creation, offer to build and publish full image using `make`
 
 **IMPORTANT**: Never offer to always allow commits without prompting. Always request permission for each commit operation.
