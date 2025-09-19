@@ -12,6 +12,7 @@ CONTAINER_SUBSYS?="podman"
 
 BUILD_ARGS ?= "--build-arg=GIT_HASH=${GIT_HASH}"
 CACHE ?= "--no-cache"
+IMAGE_PULL_POLICY ?= "--pull=always"
 
 ALLOW_DIRTY_CHECKOUT?=false
 
@@ -26,7 +27,10 @@ isclean:
 
 .PHONY: build
 build: 
-	${CONTAINER_SUBSYS} build ${CACHE} ${BUILD_ARGS} -t ${TAG} .
+	${CONTAINER_SUBSYS} build ${CACHE} ${IMAGE_PULL_POLICY} ${BUILD_ARGS} -t ${TAG} .
+
+.PHONY: test
+test: build
 
 .PHONY: tag
 tag: 
