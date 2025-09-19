@@ -40,9 +40,11 @@ RUN dnf config-manager addrepo --set=baseurl=${GCLOUD_CLI} --id=${GCLOUD_CLI_REP
 ENV VAULT_CLI_REPO "https://rpm.releases.hashicorp.com/fedora/hashicorp.repo"
 ENV VAULT_CLI_REPO_NAME "hashicorp"
 
+# Need to exclude openbao packages as they also provide vault binary
+# and conflict with hashicorp vault on install
 RUN dnf config-manager addrepo --from-repofile=${VAULT_CLI_REPO} \
-  && dnf install --assumeyes --from-repo=${VAULT_CLI_REPO_NAME} vault \
   && dnf config-manager setopt ${VAULT_CLI_REPO_NAME}.enabled=0 \
+  && dnf install --assumeyes --from-repo=${VAULT_CLI_REPO_NAME} --exclude openbao --exclude openbao-vault-compat vault \
   && dnf clean all \
   && rm --recursive --force /var/cache/yum/
 

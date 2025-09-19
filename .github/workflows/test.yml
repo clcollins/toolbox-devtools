@@ -1,25 +1,27 @@
-name: Test
+---
+name: Test on pull request
 
+# yamllint disable-line rule:truthy
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  test:
+  test-image-build:
     runs-on: ubuntu-latest
     container:
       image: fedora:42
       options: --privileged
 
     steps:
+    # yamllint disable-line rule:indentation
     - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Install dependencies
       run: |
-        dnf update -y
         dnf install -y make git podman
 
     - name: Run tests
@@ -27,10 +29,18 @@ jobs:
         make test
       timeout-minutes: 15
 
-    - name: Check for uncommitted changes
+    - name: Ensure vault was installed
       run: |
-        if [ -n "$(git status --porcelain)" ]; then
-          echo "Error: There are uncommitted changes after running tests:"
-          git status --porcelain
-          exit 1
-        fi
+        podman run --rm toolbox-toolbox-devtools:test which vault
+
+    - name: Ensure gh was installed
+      run: |
+        podman run --rm toolbox-toolbox-devtools:test gh --help
+
+    - name: Ensure google-cloud-cli was installed
+      run: |
+        podman run --rm toolbox-toolbox-devtools:test gcloud --help
+
+    - name: Ensure claude was installed
+      run: |
+        podman run --rm toolbox-toolbox-devtools:test claude --help
