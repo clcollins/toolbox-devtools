@@ -1,0 +1,36 @@
+name: Test
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:42
+      options: --privileged
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        dnf update -y
+        dnf install -y make git podman
+
+    - name: Run tests
+      run: |
+        make test
+      timeout-minutes: 15
+
+    - name: Check for uncommitted changes
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "Error: There are uncommitted changes after running tests:"
+          git status --porcelain
+          exit 1
+        fi
