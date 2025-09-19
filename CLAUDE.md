@@ -44,11 +44,15 @@ This repository contains a Containerfile and build scripts for creating a Fedora
 ## Git Workflow
 
 When making changes to this repository:
+
 1. Test and validate changes using `make test`
-2. If tests pass and commit is requested:
+2. **ALWAYS** ask for explicit permission before committing changes to git
+3. If tests pass and commit is explicitly requested:
    - Add changed files to git
    - Create commit message with descriptive body that accurately describes what is included in the commit
    - Include note that code changes, commit message, and commit were created by Claude and signed-off by @clcollins
    - Use `-s` and `-S` flags for signed commits: `git commit -s -S -m "message"`
-3. After committing, offer to create pull request using `gh pr create`
-4. After PR creation, offer to build and publish full image using `make`
+4. After committing, offer to create pull request using `gh pr create`
+5. After PR creation, offer to build and publish full image using `make`
+
+**IMPORTANT**: Never offer to always allow commits without prompting. Always request permission for each commit operation.
