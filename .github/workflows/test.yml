@@ -31,16 +31,16 @@ jobs:
 
     - name: Ensure vault was installed
       run: |
-        podman run --rm toolbox-toolbox-devtools:test which vault
+        podman run --rm toolbox-devtools:test which vault
 
     - name: Ensure gh was installed
       run: |
-        podman run --rm toolbox-toolbox-devtools:test gh --help
+        podman run --rm toolbox-devtools:test gh --help
 
     - name: Ensure google-cloud-cli was installed
       run: |
-        podman run --rm toolbox-toolbox-devtools:test gcloud --help
+        podman run --rm toolbox-devtools:test gcloud --help
 
     - name: Ensure claude was installed
       run: |
-        podman run --rm toolbox-toolbox-devtools:test claude --help
+        podman run --rm toolbox-devtools:test claude --help
