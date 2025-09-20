@@ -30,6 +30,10 @@ build:
 	${CONTAINER_SUBSYS} build ${CACHE} ${IMAGE_PULL_POLICY} ${BUILD_ARGS} -t ${TAG} .
 
 .PHONY: test
+test: TAG=toolbox-${IMAGE_NAME}:test
+test: CACHE="--no-cache"
+test: IMAGE_PULL_POLICY="--pull=always"
+test: BUILD_ARGS="--build-arg=GIT_HASH=TEST"
 test: build
 
 .PHONY: tag
