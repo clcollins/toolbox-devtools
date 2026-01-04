@@ -12,7 +12,7 @@ jobs:
   test-image-build:
     runs-on: ubuntu-latest
     container:
-      image: fedora:42
+      image: fedora:43
       options: --privileged
 
     steps:
@@ -23,6 +23,10 @@ jobs:
     - name: Install dependencies
       run: |
         dnf install -y make git podman
+
+    - name: Run validations
+      run: |
+        make validate
 
     - name: Run tests
       run: |
