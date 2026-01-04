@@ -12,7 +12,7 @@ jobs:
   test-image-build:
     runs-on: ubuntu-latest
     container:
-      image: fedora:42
+      image: fedora:43
       options: --privileged
 
     steps:
