@@ -1,20 +1,20 @@
-REGISTRY_NAME := "quay.io"
-ORG_NAME := "chcollin"
-AUTHFILE := "${HOME}/.config/quay.io/bot_auth.json"
+REGISTRY_NAME := quay.io
+ORG_NAME := chcollin
+AUTHFILE := ${HOME}/.config/quay.io/bot_auth.json
 
-IMAGE_NAME = "devtools"
+IMAGE_NAME := devtools
 GIT_HASH := $(shell git rev-parse --short HEAD)
 
 TAG := ${REGISTRY_NAME}/${ORG_NAME}/toolbox-${IMAGE_NAME}:${GIT_HASH}
 TAG_LATEST := ${REGISTRY_NAME}/${ORG_NAME}/toolbox-${IMAGE_NAME}:latest
 
-CONTAINER_SUBSYS?="podman"
+CONTAINER_SUBSYS ?= podman
 
-BUILD_ARGS ?= "--build-arg=GIT_HASH=${GIT_HASH}"
-CACHE ?= "--no-cache"
-IMAGE_PULL_POLICY ?= "--pull=always"
+BUILD_ARGS ?= --build-arg=GIT_HASH=${GIT_HASH}
+CACHE ?=
+IMAGE_PULL_POLICY ?= --pull=always
 
-ALLOW_DIRTY_CHECKOUT?=false
+ALLOW_DIRTY_CHECKOUT ?= false
 
 default: all
 
@@ -31,9 +31,9 @@ build:
 
 .PHONY: test
 test: TAG=toolbox-${IMAGE_NAME}:test
-test: CACHE="--no-cache"
-test: IMAGE_PULL_POLICY="--pull=always"
-test: BUILD_ARGS="--build-arg=GIT_HASH=TEST"
+test: CACHE=--no-cache
+test: IMAGE_PULL_POLICY=--pull=always
+test: BUILD_ARGS=--build-arg=GIT_HASH=TEST
 test: build
 
 .PHONY: tag
@@ -50,3 +50,19 @@ push:
 cleanup-bootstrap:
 	${CONTAINER_SUBSYS} stop bootstrap
 	${CONTAINER_SUBSYS} rm bootstrap
+
+.PHONY: cleanup-test
+cleanup-test:
+	${CONTAINER_SUBSYS} rmi -f toolbox-${IMAGE_NAME}:test 2>/dev/null || true
+
+.PHONY: help
+help:
+	@echo "Available targets:"
+	@echo "  all                - Run isclean, build, tag, and push (default)"
+	@echo "  build              - Build the devtools image"
+	@echo "  test               - Build and test the image with no cache"
+	@echo "  tag                - Tag the built image"
+	@echo "  push               - Push images to registry"
+	@echo "  isclean            - Check if git working directory is clean"
+	@echo "  cleanup-test       - Remove test images"
+	@echo "  cleanup-bootstrap  - Stop and remove bootstrap container"
