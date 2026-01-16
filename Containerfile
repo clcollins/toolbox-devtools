@@ -12,7 +12,8 @@ ENV EDITOR=vi
 ENV CONTAINER_SUBSYS="flatpak-spawn --host podman"
 
 # Define package lists
-ENV PKGS="make gcc bison binutils jq flatpak flatpak-spawn httpie NetworkManager nodejs-npm tmux gnome-keyring glab ShellCheck skopeo tox yamllint yq"
+# Pinentry/gnome-keyring needed for GPG signing,etc
+ENV PKGS="make gcc bison binutils jq flatpak flatpak-spawn httpie NetworkManager nodejs-npm tmux gnome-keyring glab pinentry ShellCheck skopeo tox yamllint yq"
 ENV LANGUAGE_PKGS="python3 python3-pip tinygo"
 ENV NPM_PKGS="@anthropic-ai/claude-code markdownlint-cli2"
 
