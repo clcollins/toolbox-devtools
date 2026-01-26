@@ -13,7 +13,8 @@ ENV CONTAINER_SUBSYS="flatpak-spawn --host podman"
 
 # Define package lists
 # Pinentry/gnome-keyring needed for GPG signing,etc
-ENV PKGS="make gcc bison binutils jq flatpak flatpak-spawn httpie NetworkManager nodejs-npm tmux gnome-keyring glab pinentry ShellCheck skopeo tox yamllint yq"
+# flatpak-xdg-open allows for opening the browser outside of the toolbox
+ENV PKGS="make gcc bison binutils jq flatpak flatpak-spawn httpie NetworkManager nodejs-npm tmux flatpak-xdg-open gnome-keyring glab pinentry ShellCheck skopeo tox yamllint yq"
 ENV LANGUAGE_PKGS="python3 python3-pip tinygo"
 ENV NPM_PKGS="@anthropic-ai/claude-code markdownlint-cli2"
 
@@ -22,6 +23,9 @@ RUN dnf update --assumeyes \
   && dnf install --assumeyes 'dnf-command(config-manager)' $PKGS $LANGUAGE_PKGS \
   && dnf clean all \
   && rm --recursive --force /var/cache/yum/
+
+# Use flatpak-xdg-open to open browsers external to the toolbox
+RUN ln -s /usr/bin/flatpak-xdg-open /usr/bin/xdg-open
 
 # Install Google Cloud CLI
 # Repository: https://cloud.google.com/sdk/docs/install#rpm
