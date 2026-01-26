@@ -14,7 +14,7 @@ ENV CONTAINER_SUBSYS="flatpak-spawn --host podman"
 # Define package lists
 # Pinentry/gnome-keyring needed for GPG signing,etc
 # flatpak-xdg-open allows for opening the browser outside of the toolbox
-ENV PKGS="make gcc bison binutils jq flatpak flatpak-spawn httpie NetworkManager nodejs-npm tmux flatpak-xdg-open gnome-keyring glab pinentry ShellCheck skopeo tox yamllint yq"
+ENV PKGS="make gcc bison binutils jq flatpak flatpak-spawn glab httpie NetworkManager nodejs-npm tmux flatpak-xdg-open gnome-keyring glab pinentry ShellCheck skopeo tox yamllint yq"
 ENV LANGUAGE_PKGS="python3 python3-pip tinygo"
 ENV NPM_PKGS="@anthropic-ai/claude-code markdownlint-cli2"
 
