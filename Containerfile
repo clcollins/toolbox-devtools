@@ -16,11 +16,12 @@ ENV CONTAINER_SUBSYS="flatpak-spawn --host podman"
 # flatpak-xdg-open allows for opening the browser outside of the toolbox
 ENV PKGS="make gcc bison binutils jq flatpak flatpak-spawn glab httpie NetworkManager nodejs-npm tmux flatpak-xdg-open gnome-keyring glab pinentry ShellCheck skopeo tox yamllint yq"
 ENV LANGUAGE_PKGS="python3 python3-pip tinygo"
+ENV DOCUMENT_PKGS="pandoc texlive"
 ENV NPM_PKGS="@anthropic-ai/claude-code markdownlint-cli2"
 
 # Update system and install base packages plus config-manager
 RUN dnf update --assumeyes \
-  && dnf install --assumeyes 'dnf-command(config-manager)' $PKGS $LANGUAGE_PKGS \
+  && dnf install --assumeyes 'dnf-command(config-manager)' $PKGS $LANGUAGE_PKGS $DOCUMENT_PACKAGES \
   && dnf clean all \
   && rm --recursive --force /var/cache/yum/
 
