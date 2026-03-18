@@ -2,6 +2,22 @@
 # and run with `toolbox create --image NAME`. This allows podman on the
 # host to be used from within the toolbox via the flatpak-spawn command.
 
+# Claude Code Builder
+FROM quay.io/redhat-services-prod/openshift/ocm-container:latest as claude-builder
+
+# Version 2.1.39 released 2026-02-10T21:13:30Z
+# Will update to latest with `claude install latest` further in the build
+# Only needs to happen on a fresh build with a fresh host since the binary directory is shared with the toolbox
+ARG CLAUDE_VERSION="2.1.39"
+ARG CLAUDE_CHECKSUM="68e4775b293d95e06d168581c523fc5c1523968179229d31a029f285b2aceaff"
+ARG CLAUDE_PLATFORM="linux-x64"
+ARG CLAUDE_GCS_BUCKET="https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases"
+
+# Download and verify Claude Code binary
+ADD ${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/${CLAUDE_PLATFORM}/claude /tmp/claude
+RUN echo "${CLAUDE_CHECKSUM}  /tmp/claude" | sha256sum --check --status && \
+    chmod +x /tmp/claude
+
 FROM registry.fedoraproject.org/fedora-toolbox:43
 LABEL author="Chris Collins <collins.christopher@gmail.com>"
 
@@ -14,10 +30,10 @@ ENV CONTAINER_SUBSYS="flatpak-spawn --host podman"
 # Define package lists
 # Pinentry/gnome-keyring needed for GPG signing,etc
 # flatpak-xdg-open allows for opening the browser outside of the toolbox
-ENV PKGS="make gcc bison binutils jq flatpak flatpak-spawn glab httpie NetworkManager nodejs-npm tmux flatpak-xdg-open gnome-keyring glab pinentry ShellCheck skopeo tox yamllint yq"
+# guestfs-tools provides virt-builder for building custom disk images
+ENV PKGS="make gcc bison binutils jq flatpak flatpak-spawn glab httpie NetworkManager nodejs-npm tmux flatpak-xdg-open gnome-keyring glab pinentry ShellCheck skopeo tox yamllint yq guestfs-tools"
 ENV LANGUAGE_PKGS="python3 python3-pip tinygo"
 ENV DOCUMENT_PKGS="pandoc texlive"
-ENV NPM_PKGS="@anthropic-ai/claude-code markdownlint-cli2"
 
 # Update system and install base packages plus config-manager
 RUN dnf update --assumeyes \
@@ -62,8 +78,9 @@ RUN dnf config-manager addrepo --from-repofile=${GH_CLI} \
   && dnf clean all \
   && rm --recursive --force /var/cache/yum/
 
-# Install NPM packages (separate layer allows caching when only NPM deps change)
-RUN npm install -g ${NPM_PKGS}
+# Install Claude Code
+COPY --from=claude-builder /tmp/claude ${BIN_DIR}/claude
+RUN claude install latest
 
 # Create podman wrapper script to use host podman via flatpak-spawn
 # This allows the toolbox container to interact with the host's podman daemon
