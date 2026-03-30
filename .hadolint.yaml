@@ -1,0 +1,8 @@
+---
+ignored:
+  # Pinning Fedora package versions is impractical for a rolling toolbox
+  - DL3041
+  # Word splitting is intentional for package list variables
+  - SC2086
+  # Single quotes in printf prevent variable expansion intentionally
+  - SC2016

@@ -3,7 +3,10 @@
 # host to be used from within the toolbox via the flatpak-spawn command.
 
 # Claude Code Builder
-FROM quay.io/redhat-services-prod/openshift/ocm-container:latest as claude-builder
+# hadolint ignore=DL3007
+FROM quay.io/redhat-services-prod/openshift/ocm-container:latest AS claude-builder
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Version 2.1.39 released 2026-02-10T21:13:30Z
 # Will update to latest with `claude install latest` further in the build
@@ -14,15 +17,17 @@ ARG CLAUDE_PLATFORM="linux-x64"
 ARG CLAUDE_GCS_BUCKET="https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases"
 
 # Download and verify Claude Code binary
-ADD ${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/${CLAUDE_PLATFORM}/claude /tmp/claude
-RUN echo "${CLAUDE_CHECKSUM}  /tmp/claude" | sha256sum --check --status && \
-    chmod +x /tmp/claude
+RUN curl -sL "${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/${CLAUDE_PLATFORM}/claude" -o /tmp/claude \
+    && echo "${CLAUDE_CHECKSUM}  /tmp/claude" | sha256sum --check --status \
+    && chmod +x /tmp/claude
 
 FROM registry.fedoraproject.org/fedora-toolbox:43
 LABEL author="Chris Collins <collins.christopher@gmail.com>"
 
 ARG GIT_HASH
 LABEL toolbox-devtools-version=${GIT_HASH}
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ENV EDITOR=vi
 ENV CONTAINER_SUBSYS="flatpak-spawn --host podman"
