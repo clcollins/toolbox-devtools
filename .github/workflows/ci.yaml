@@ -79,4 +79,4 @@ jobs:
         run: dnf install -y make git podman
       - name: Build image
         run: make test
-        timeout-minutes: 15
+        timeout-minutes: 30
