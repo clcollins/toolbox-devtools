@@ -70,8 +70,7 @@ ARG CLAUDE_PLATFORM="linux-x64"
 ARG CLAUDE_GCS_BUCKET="https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases"
 
 RUN curl -fSL "${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/${CLAUDE_PLATFORM}/claude" -o /usr/local/bin/claude \
-  && sha256sum /usr/local/bin/claude \
-  && test "$(sha256sum /usr/local/bin/claude | cut -d' ' -f1)" = "${CLAUDE_CHECKSUM}" \
+  && echo "${CLAUDE_CHECKSUM}  /usr/local/bin/claude" | sha256sum --check --status \
   && chmod +x /usr/local/bin/claude \
   && claude install latest
 

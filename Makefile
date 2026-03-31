@@ -65,8 +65,6 @@ clean: cleanup-test cleanup-bootstrap
 
 .PHONY: help
 help:
-	@echo "Targets: all build test tag push isclean validate clean help"
-	@echo "  all       - isclean, build, tag, push (default)"
-	@echo "  build     - Build the devtools image"
-	@echo "  test      - Validate and build image (no cache)"
-	@echo "  clean     - Remove test images and bootstrap container"
+	@echo "all (default) | build | test | tag | push | isclean | validate"
+	@echo "clean | cleanup-test | cleanup-bootstrap | help"
+	@echo "Run 'make <target>' for any of the above."
