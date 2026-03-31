@@ -16,6 +16,7 @@ IMAGE_PULL_POLICY ?= --pull=always
 
 ALLOW_DIRTY_CHECKOUT ?= false
 
+.PHONY: default
 default: all
 
 .PHONY: all
@@ -27,16 +28,7 @@ isclean:
 
 .PHONY: validate-fedora-version
 validate-fedora-version:
-	@echo "Validating Fedora version consistency..."
-	@CONTAINERFILE_VERSION=$$(grep -E '^FROM registry.fedoraproject.org/fedora-toolbox:' Containerfile | sed -E 's/.*:([0-9]+).*/\1/'); \
-	CI_VERSION=$$(grep -E 'image: fedora:' .github/workflows/test.yml | sed -E 's/.*fedora:([0-9]+).*/\1/'); \
-	echo "  Containerfile: Fedora $$CONTAINERFILE_VERSION"; \
-	echo "  CI workflow:   Fedora $$CI_VERSION"; \
-	if [ "$$CONTAINERFILE_VERSION" != "$$CI_VERSION" ]; then \
-		echo "Error: Fedora version mismatch between Containerfile and CI workflow!" >&2; \
-		exit 1; \
-	fi; \
-	echo "✓ Fedora versions match ($$CONTAINERFILE_VERSION)"
+	@sh scripts/validate-fedora-version.sh
 
 .PHONY: validate
 validate: validate-fedora-version
@@ -46,11 +38,8 @@ build:
 	${CONTAINER_SUBSYS} build ${CACHE} ${IMAGE_PULL_POLICY} ${BUILD_ARGS} -t ${TAG} .
 
 .PHONY: test
-test: TAG=toolbox-${IMAGE_NAME}:test
-test: CACHE=--no-cache
-test: IMAGE_PULL_POLICY=--pull=always
-test: BUILD_ARGS=--build-arg=GIT_HASH=TEST
-test: validate build
+test: validate
+	$(CONTAINER_SUBSYS) build --no-cache --pull=always --build-arg=GIT_HASH=TEST -t toolbox-$(IMAGE_NAME):test .
 
 .PHONY: tag
 tag: 
@@ -64,23 +53,18 @@ push:
 
 .PHONY: cleanup-bootstrap
 cleanup-bootstrap:
-	${CONTAINER_SUBSYS} stop bootstrap
-	${CONTAINER_SUBSYS} rm bootstrap
+	${CONTAINER_SUBSYS} stop --ignore bootstrap
+	${CONTAINER_SUBSYS} rm --ignore bootstrap
 
 .PHONY: cleanup-test
 cleanup-test:
 	${CONTAINER_SUBSYS} rmi -f toolbox-${IMAGE_NAME}:test 2>/dev/null || true
 
+.PHONY: clean
+clean: cleanup-test cleanup-bootstrap
+
 .PHONY: help
 help:
-	@echo "Available targets:"
-	@echo "  all                      - Run isclean, build, tag, and push (default)"
-	@echo "  build                    - Build the devtools image"
-	@echo "  test                     - Run validations and build/test image with no cache"
-	@echo "  tag                      - Tag the built image"
-	@echo "  push                     - Push images to registry"
-	@echo "  isclean                  - Check if git working directory is clean"
-	@echo "  validate                 - Run all validation checks"
-	@echo "  validate-fedora-version  - Validate Containerfile and CI use same Fedora version"
-	@echo "  cleanup-test             - Remove test images"
-	@echo "  cleanup-bootstrap        - Stop and remove bootstrap container"
+	@echo "all (default) | build | test | tag | push | isclean | validate"
+	@echo "clean | cleanup-test | cleanup-bootstrap | help"
+	@echo "Run 'make <target>' for any of the above."

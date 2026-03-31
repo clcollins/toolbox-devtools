@@ -7,7 +7,7 @@ CONTAINER="devtools"
 IMAGE="localhost/${CONTAINER}:latest"
 
 # Check if running inside a toolbox container
-if [ "${HOSTNAME}" = "toolbox" ]; then
+if [ "$(hostname)" = "toolbox" ]; then
   echo "Error: Cannot replace container from inside itself." >&2
   exit 1
 fi
