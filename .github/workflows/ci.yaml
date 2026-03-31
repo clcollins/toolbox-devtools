@@ -30,7 +30,7 @@ jobs:
         with:
           go-version: "1.25"
       - name: Install checkmake
-        run: go install github.com/mrtazz/checkmake/cmd/checkmake@0.2.2
+        run: go install github.com/mrtazz/checkmake/cmd/checkmake@v0.2.2
       - name: Run checkmake
         run: checkmake Makefile
 

@@ -5,6 +5,10 @@ set -o nounset
 
 echo "Validating Fedora version consistency..."
 CONTAINERFILE_VERSION=$(grep -E '^FROM registry.fedoraproject.org/fedora-toolbox:' Containerfile | sed -E 's/.*:([0-9]+).*/\1/')
+if [ -z "${CONTAINERFILE_VERSION}" ]; then
+	echo "Error: could not determine Containerfile Fedora version" >&2
+	exit 1
+fi
 
 CI_VERSIONS_RAW=$(grep -E 'image: fedora:' .github/workflows/ci.yaml | sed -E 's/.*fedora:([0-9]+).*/\1/' | sort -u)
 CI_VERSION_COUNT=$(printf '%s\n' "${CI_VERSIONS_RAW}" | sed '/^$/d' | wc -l | tr -d ' ')
