@@ -84,7 +84,7 @@ RUN dnf config-manager addrepo --from-repofile=${GH_CLI} \
   && rm --recursive --force /var/cache/yum/
 
 # Install Claude Code
-COPY --from=claude-builder /tmp/claude ${BIN_DIR}/claude
+COPY --from=claude-builder /tmp/claude /usr/local/bin/claude
 RUN claude install latest
 
 # Create podman wrapper script to use host podman via flatpak-spawn
