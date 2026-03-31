@@ -2,32 +2,11 @@
 # and run with `toolbox create --image NAME`. This allows podman on the
 # host to be used from within the toolbox via the flatpak-spawn command.
 
-# Claude Code Builder
-# hadolint ignore=DL3007
-FROM quay.io/redhat-services-prod/openshift/ocm-container:latest AS claude-builder
-
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
-# Version 2.1.39 released 2026-02-10T21:13:30Z
-# Will update to latest with `claude install latest` further in the build
-# Only needs to happen on a fresh build with a fresh host since the binary directory is shared with the toolbox
-ARG CLAUDE_VERSION="2.1.39"
-ARG CLAUDE_CHECKSUM="68e4775b293d95e06d168581c523fc5c1523968179229d31a029f285b2aceaff"
-ARG CLAUDE_PLATFORM="linux-x64"
-ARG CLAUDE_GCS_BUCKET="https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases"
-
-# Download and verify Claude Code binary
-RUN curl -sL "${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/${CLAUDE_PLATFORM}/claude" -o /tmp/claude \
-    && echo "${CLAUDE_CHECKSUM}  /tmp/claude" | sha256sum --check --status \
-    && chmod +x /tmp/claude
-
 FROM registry.fedoraproject.org/fedora-toolbox:43
 LABEL author="Chris Collins <collins.christopher@gmail.com>"
 
 ARG GIT_HASH
 LABEL toolbox-devtools-version=${GIT_HASH}
-
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ENV EDITOR=vi
 ENV CONTAINER_SUBSYS="flatpak-spawn --host podman"
@@ -84,11 +63,19 @@ RUN dnf config-manager addrepo --from-repofile=${GH_CLI} \
   && rm --recursive --force /var/cache/yum/
 
 # Install Claude Code
-COPY --from=claude-builder /tmp/claude /usr/local/bin/claude
-RUN claude install latest
+# Download, verify checksum, and install; then update to latest
+ARG CLAUDE_VERSION="2.1.39"
+ARG CLAUDE_CHECKSUM="68e4775b293d95e06d168581c523fc5c1523968179229d31a029f285b2aceaff"
+ARG CLAUDE_PLATFORM="linux-x64"
+ARG CLAUDE_GCS_BUCKET="https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases"
+
+RUN curl -sL "${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/${CLAUDE_PLATFORM}/claude" -o /usr/local/bin/claude \
+  && sha256sum /usr/local/bin/claude \
+  && test "$(sha256sum /usr/local/bin/claude | cut -d' ' -f1)" = "${CLAUDE_CHECKSUM}" \
+  && chmod +x /usr/local/bin/claude \
+  && claude install latest
 
 # Create podman wrapper script to use host podman via flatpak-spawn
 # This allows the toolbox container to interact with the host's podman daemon
 RUN printf '#!/bin/sh\nexec ${CONTAINER_SUBSYS} "$@"\n' > /usr/bin/podman \
   && chmod +x /usr/bin/podman
-
