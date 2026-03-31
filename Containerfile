@@ -74,7 +74,29 @@ RUN curl -fSL "${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/${CLAUDE_PLATFORM}/claude"
   && chmod +x /usr/local/bin/claude \
   && claude install latest
 
-# Create podman wrapper script to use host podman via flatpak-spawn
-# This allows the toolbox container to interact with the host's podman daemon
-RUN printf '#!/bin/sh\nexec ${CONTAINER_SUBSYS} "$@"\n' > /usr/bin/podman \
+# Install promtool (from Prometheus release)
+RUN PROMTOOL_VERSION=$(curl -fsSL https://api.github.com/repos/prometheus/prometheus/releases/latest | jq -r '.tag_name' | sed 's/^v//') \
+  && curl -fsSL "https://github.com/prometheus/prometheus/releases/download/v${PROMTOOL_VERSION}/prometheus-${PROMTOOL_VERSION}.linux-amd64.tar.gz" \
+  | tar xz --strip-components=1 -C /usr/local/bin "prometheus-${PROMTOOL_VERSION}.linux-amd64/promtool"
+
+# Install kustomize
+RUN KUSTOMIZE_VERSION=$(curl -fsSL https://api.github.com/repos/kubernetes-sigs/kustomize/releases | jq -r '[.[] | select(.tag_name | startswith("kustomize/")) | select(.prerelease == false) | select(.draft == false)][0].tag_name' | sed 's|kustomize/||') \
+  && curl -fsSL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" \
+  | tar xz -C /usr/local/bin kustomize
+
+# Install kubeseal
+RUN KUBESEAL_VERSION=$(curl -fsSL https://api.github.com/repos/bitnami-labs/sealed-secrets/releases/latest | jq -r '.tag_name' | sed 's/^v//') \
+  && curl -fsSL "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION}-linux-amd64.tar.gz" \
+  | tar xz -C /usr/local/bin kubeseal
+
+# Install kubectl
+RUN KUBECTL_VERSION=$(curl -fsSL https://dl.k8s.io/release/stable.txt) \
+  && curl -fsSL "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl \
+  && chmod +x /usr/local/bin/kubectl
+
+# Create podman wrapper script to use host podman via flatpak-spawn.
+# Forwards all environment variables to the host's podman using --env-fd
+# with null-delimited output, so env vars (e.g., GITHUB_TOKEN) are available
+# to podman build --secret env= and other commands that need them.
+RUN printf '#!/bin/bash\nexec 3< <(env -0)\nexec flatpak-spawn --host --env-fd=3 podman "$@"\n' > /usr/bin/podman \
   && chmod +x /usr/bin/podman
