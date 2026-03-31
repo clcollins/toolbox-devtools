@@ -28,7 +28,7 @@ isclean:
 
 .PHONY: validate-fedora-version
 validate-fedora-version:
-	@./scripts/validate-fedora-version.sh
+	@sh scripts/validate-fedora-version.sh
 
 .PHONY: validate
 validate: validate-fedora-version
@@ -53,8 +53,8 @@ push:
 
 .PHONY: cleanup-bootstrap
 cleanup-bootstrap:
-	${CONTAINER_SUBSYS} stop --ignore bootstrap || true
-	${CONTAINER_SUBSYS} rm bootstrap 2>/dev/null || true
+	${CONTAINER_SUBSYS} stop --ignore bootstrap
+	${CONTAINER_SUBSYS} rm --ignore bootstrap
 
 .PHONY: cleanup-test
 cleanup-test:
