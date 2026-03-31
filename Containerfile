@@ -69,7 +69,7 @@ ARG CLAUDE_CHECKSUM="68e4775b293d95e06d168581c523fc5c1523968179229d31a029f285b2a
 ARG CLAUDE_PLATFORM="linux-x64"
 ARG CLAUDE_GCS_BUCKET="https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases"
 
-RUN curl -sL "${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/${CLAUDE_PLATFORM}/claude" -o /usr/local/bin/claude \
+RUN curl -fSL "${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/${CLAUDE_PLATFORM}/claude" -o /usr/local/bin/claude \
   && sha256sum /usr/local/bin/claude \
   && test "$(sha256sum /usr/local/bin/claude | cut -d' ' -f1)" = "${CLAUDE_CHECKSUM}" \
   && chmod +x /usr/local/bin/claude \

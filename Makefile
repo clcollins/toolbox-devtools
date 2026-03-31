@@ -53,8 +53,8 @@ push:
 
 .PHONY: cleanup-bootstrap
 cleanup-bootstrap:
-	${CONTAINER_SUBSYS} stop bootstrap
-	${CONTAINER_SUBSYS} rm bootstrap
+	${CONTAINER_SUBSYS} stop --ignore bootstrap || true
+	${CONTAINER_SUBSYS} rm bootstrap 2>/dev/null || true
 
 .PHONY: cleanup-test
 cleanup-test:
