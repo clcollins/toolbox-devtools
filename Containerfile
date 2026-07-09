@@ -15,7 +15,7 @@ ENV CONTAINER_SUBSYS="flatpak-spawn --host podman"
 # Pinentry/gnome-keyring needed for GPG signing,etc
 # flatpak-xdg-open allows for opening the browser outside of the toolbox
 # guestfs-tools provides virt-builder for building custom disk images
-ENV PKGS="make gcc bison binutils jq flatpak flatpak-spawn glab httpie NetworkManager nodejs-npm tmux flatpak-xdg-open gnome-keyring glab pinentry ShellCheck skopeo tox yamllint yq guestfs-tools pipewire-utils"
+ENV PKGS="make gcc bison binutils jq flatpak flatpak-spawn glab httpie NetworkManager tmux flatpak-xdg-open gnome-keyring glab pinentry ShellCheck skopeo tox yamllint yq guestfs-tools pipewire-utils bats python3-ansible-lint"
 ENV LANGUAGE_PKGS="python3 python3-pip tinygo"
 ENV DOCUMENT_PKGS="pandoc texlive"
 
