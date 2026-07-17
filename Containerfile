@@ -62,6 +62,18 @@ RUN dnf config-manager addrepo --from-repofile=${GH_CLI} \
   && dnf clean all \
   && rm --recursive --force /var/cache/yum/
 
+# Install Visual Studio Code
+# Repository: https://code.visualstudio.com/docs/setup/linux#_rhel-fedora-and-centos-based-distributions
+ENV VSCODE_REPO="https://packages.microsoft.com/yumrepos/vscode"
+ENV VSCODE_REPO_NAME="vscode"
+ENV VSCODE_KEY="https://packages.microsoft.com/keys/microsoft.asc"
+
+RUN rpm --import ${VSCODE_KEY} \
+  && dnf config-manager addrepo --set=baseurl=${VSCODE_REPO} --id=${VSCODE_REPO_NAME} --set=enabled=0 \
+  && dnf install --assumeyes --from-repo=${VSCODE_REPO_NAME} code \
+  && dnf clean all \
+  && rm --recursive --force /var/cache/yum/
+
 # Install Claude Code
 # Download, verify checksum, and install; then update to latest
 ARG CLAUDE_VERSION="2.1.39"
