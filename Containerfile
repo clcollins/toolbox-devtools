@@ -3,7 +3,7 @@
 # host to be used from within the toolbox via the flatpak-spawn command.
 
 FROM registry.fedoraproject.org/fedora-toolbox:43 as base
-RUN dnf install --assumeyes jq
+RUN dnf install --assumeyes jq \
   && dnf clean all \
   && rm --recursive --force /var/cache/yum/
 
