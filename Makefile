@@ -10,7 +10,7 @@ TAG_LATEST := ${REGISTRY_NAME}/${ORG_NAME}/toolbox-${IMAGE_NAME}:latest
 
 CONTAINER_SUBSYS ?= podman
 
-BUILD_ARGS ?= --build-arg=GIT_HASH=${GIT_HASH}
+BUILD_ARGS ?= --build-arg=GIT_HASH=${GIT_HASH} --jobs=5
 CACHE ?=
 IMAGE_PULL_POLICY ?= --pull=always
 
