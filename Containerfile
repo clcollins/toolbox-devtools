@@ -4,6 +4,8 @@
 
 FROM registry.fedoraproject.org/fedora-toolbox:43 as base
 RUN dnf install --assumeyes jq
+  && dnf clean all \
+  && rm --recursive --force /var/cache/yum/
 
 FROM base as claude
 # Install Claude Code
@@ -60,6 +62,19 @@ RUN curl -fSL "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kube
   && echo "${KUBECTL_CHECKSUM}  /usr/local/bin/kubectl" | sha256sum --check --status \
   && chmod +x /usr/local/bin/kubectl
 
+FROM base as jira-cli
+# Install Jira CLI (ankitpokhrel/jira-cli)
+# Download, verify checksum, and install
+ARG JIRA_VERSION="1.7.0"
+ARG JIRA_CHECKSUM="b5e0ba4804f3f11f92c483d9a6ea9ebccec1c735cd2e12b0440cab9d7afd626a"
+
+RUN curl -fSL "https://github.com/ankitpokhrel/jira-cli/releases/download/v${JIRA_VERSION}/jira_${JIRA_VERSION}_linux_x86_64.tar.gz" -o /tmp/jira.tar.gz \
+  && echo "${JIRA_CHECKSUM}  /tmp/jira.tar.gz" | sha256sum --check --status \
+  && tar xz --strip-components=2 -C /usr/local/bin -f /tmp/jira.tar.gz "jira_${JIRA_VERSION}_linux_x86_64/bin/jira" \
+  && rm /tmp/jira.tar.gz \
+  && mkdir -p /etc/bash_completion.d \
+  && jira completion bash > /etc/bash_completion.d/jira
+
 FROM base
 LABEL author="Chris Collins <collins.christopher@gmail.com>"
 
@@ -114,7 +129,9 @@ RUN dnf install --assumeyes 'dnf-command(config-manager)' \
   && dnf config-manager addrepo --set=baseurl=${VSCODE_REPO} --id=${VSCODE_REPO_NAME} \
   && rpm --import ${GCLOUD_KEYS} \
   && rpm --import ${CHARM_KEYS} \
-  && rpm --import ${VSCODE_KEYS}
+  && rpm --import ${VSCODE_KEYS} \
+  && dnf clean all \
+  && rm --recursive --force /var/cache/yum/
 
 # Update system, then install packages
 # Skip weak dependencies and docs to reduce image size
@@ -140,6 +157,8 @@ COPY --from=promtool /usr/local/bin/promtool /usr/local/bin/promtool
 COPY --from=kustomize /usr/local/bin/kustomize /usr/local/bin/kustomize
 COPY --from=kubeseal /usr/local/bin/kubeseal /usr/local/bin/kubeseal
 COPY --from=kubectl /usr/local/bin/kubectl /usr/local/bin/kubectl
+COPY --from=jira-cli /usr/local/bin/jira /usr/local/bin/jira
+COPY --from=jira-cli /etc/bash_completion.d/jira /etc/bash_completion.d/jira
 
 # Placed last so that GIT_HASH changing on every commit only busts this
 # layer's cache, not the expensive package-install layers above it.
