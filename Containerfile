@@ -2,7 +2,7 @@
 # and run with `toolbox create --image NAME`. This allows podman on the
 # host to be used from within the toolbox via the flatpak-spawn command.
 
-FROM registry.fedoraproject.org/fedora-toolbox:43 as base
+FROM registry.fedoraproject.org/fedora-toolbox:44 as base
 RUN dnf install --assumeyes jq \
   && dnf clean all \
   && rm --recursive --force /var/cache/yum/
