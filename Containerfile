@@ -75,6 +75,22 @@ RUN curl -fSL "https://github.com/ankitpokhrel/jira-cli/releases/download/v${JIR
   && mkdir -p /etc/bash_completion.d \
   && jira completion bash > /etc/bash_completion.d/jira
 
+FROM base as openshell
+# Install OpenShell CLI (RPM from GitHub release)
+# Download and verify checksum against the release asset.
+# NVIDIA does not GPG-sign these RPMs; sha256 is the integrity check
+# (matches NVIDIA's own install.sh, which verifies against
+# openshell-checksums-sha256.txt).
+ARG OPENSHELL_CHECKSUM="32cd314b4b82f1ea71c124fecf1e5edff4a28565926d991052725e864ccfc058"
+ARG OPENSHELL_VERSION="0.0.109"
+ARG OPENSHELL_RELEASE="1"
+ARG OPENSHELL_DIST_TAG="fc44"
+ARG OPENSHELL_ARCH="x86_64"
+ARG OPENSHELL_DOWNLOAD_URL="https://github.com/NVIDIA/OpenShell/releases/download/v${OPENSHELL_VERSION}/openshell-${OPENSHELL_VERSION}-${OPENSHELL_RELEASE}.${OPENSHELL_DIST_TAG}.${OPENSHELL_ARCH}.rpm"
+
+RUN curl -fSL "${OPENSHELL_DOWNLOAD_URL}" -o /tmp/openshell.rpm \
+  && echo "${OPENSHELL_CHECKSUM}  /tmp/openshell.rpm" | sha256sum --check --status
+
 FROM base
 LABEL author="Chris Collins <collins.christopher@gmail.com>"
 
@@ -119,6 +135,10 @@ ENV VSCODE_REPO="https://packages.microsoft.com/yumrepos/vscode"
 ENV VSCODE_REPO_NAME="vscode"
 ENV VSCODE_KEYS="https://packages.microsoft.com/keys/microsoft.asc"
 ENV PKGS="${PKGS} code"
+
+# OpenShell CLI
+COPY --from=openshell /tmp/openshell.rpm /tmp/openshell.rpm
+ENV PKGS="${PKGS} /tmp/openshell.rpm"
 
 # Install config-manager, create repo files, and import keys
 RUN dnf install --assumeyes 'dnf-command(config-manager)' \
